@@ -4,9 +4,9 @@
    OS Ubuntu 14.04 LTS
    IDE Code::Blocks 13.12
 
-   This menu driven program helps balance a checkbook.
+   This program helps balance a checkbook.
    The user enters the initial balance, then any number
-   of transactions. Each transaction includes a menu
+   of transactions. Each transaction includes a letter
    choice and a transaction amount. The program
    then prints a confirmation, a running balance,
    whether there is a service charge, and a service
