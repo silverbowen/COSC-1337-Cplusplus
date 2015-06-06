@@ -56,7 +56,7 @@ int main()
             cin  >> changeAmount;
 
             // error check transaction amount
-            if (changeAmount < 0)
+            if (changeAmount <= 0)
                 cout << "You must enter an amount greater than zero!\n";
 
             else
@@ -95,7 +95,7 @@ int main()
             cin  >> changeAmount;
 
             // error check transaction amount
-            if (changeAmount < 0)
+            if (changeAmount <= 0)
                 cout << "Please enter an amount greater than zero.\n\n";
 
             else
