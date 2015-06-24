@@ -28,9 +28,9 @@ void populate(TableEntry []);  // This will populate our array
 void showPrompt(); // This will give our opening prompt
 bool getTransaction(int&, int&, int&, int&); // This gets input from user
 void showResult(int, string, int, float); // Prints transaction results
-bool errorMessage(int&, int&, int&, int&);    // This checks for negative input
+bool errorMessage(int, int, int, int);    // This checks for negative input
 float getCost(int, TableEntry []); // This calculates the cost
-bool getStatus(int&, int&, int&, int&);  // This determines accepted or rejected
+bool getStatus(int, int, int, int);  // This determines accepted or rejected
 void showTotals(int, int);  //This shows total accepted/rejected transactions
 
 
@@ -190,7 +190,7 @@ bool getTransaction(int &weight, int &len1, int &len2, int &len3)
 
 /* the getStatus function gets the status of a transaction
    and returns a bool to main true for accepted, false otherwise). */
-bool getStatus(int &weight, int &len1, int &len2, int &len3)
+bool getStatus(int weight, int len1, int len2, int len3)
 {
      // initialize variables
      bool status = false;  // our bool
@@ -233,7 +233,7 @@ float getCost(int weight, TableEntry table[])
 /* errorMessage prints an error message if needed.
    It also returns a bool that serves as a flag for whether
    to continue processing the input or whether to restart. */
-bool errorMessage(int &weight, int &len1, int &len2, int &len3)
+bool errorMessage(int weight, int len1, int len2, int len3)
 {
      bool error = false; // variable to hold return value
 
