@@ -25,13 +25,13 @@ int MAX_WEIGHT = 50, // maximum weight in lbs
 // Prototypes
 class TableEntry;  // This class will hold table entries
 void populate(TableEntry []);  // This will populate our array
-void prompt(); // This will give our opening prompt
-bool getTransaction(int []); // This gets input from user
-void showResult(int, string, int, float); // Prints the result of the transaction
-bool errorMessage(int []);    // This checks for negative input
+void showPrompt(); // This will give our opening prompt
+bool getTransaction(int&, int&, int&, int&); // This gets input from user
+void showResult(int, string, int, float); // Prints transaction results
+bool errorMessage(int&, int&, int&, int&);    // This checks for negative input
 float getCost(int, TableEntry []); // This calculates the cost
-bool getStatus(int []);  // This determines accepted or rejected
-void showTotals(int, int);  //this shows total accepted/rejected transactions
+bool getStatus(int&, int&, int&, int&);  // This determines accepted or rejected
+void showTotals(int, int);  //This shows total accepted/rejected transactions
 
 
 /* Class TableEntry holds one pair of weight/shipping
@@ -63,7 +63,10 @@ class TableEntry
 int main()
 {
      // Define variables
-     int measure[4],  // this is an array that holds 4 items of user input
+     int weight,  // holds package weight
+         len1,    // these three hold the package dimensions
+         len2,
+         len3,
          trans = 0,   // counter that keeps track of current transaction number
          accepted = 0, // # of accepted packages
          rejected = 0; // # of rejected packages
@@ -77,25 +80,25 @@ int main()
      cout << fixed << setprecision(2);
 
      // Call functions
-     populate(table); // Put all the table data in our array
-     prompt();        // Say hi to user
+     populate(table);  // Put all the table data in our array
+     showPrompt();        // Say hi to user
 
      /* This loop keeps going as long as getTransaction keeps
         returning true (ie, no -1 input for weight). */
-     while (getTransaction(measure)) // get input from user
+     while (getTransaction(weight, len1, len2, len3)) // get input from user
      {
          /* Decide whether to continue or not. If an
             error message is displayed,we skip the rest
             of the processing and go back to the top. */
-         if (!errorMessage(measure))
+         if (!errorMessage(weight, len1, len2, len3))
          {
              trans++; // only iterates if no error
 
-             if (getStatus(measure)) // get the status
+             if (getStatus(weight, len1, len2, len3)) // get the status
              {
                  status = "Accepted"; // if package is accepted,
                  accepted++;          // iterate accepted and get the cost.
-                 cost = getCost(measure[0], table);
+                 cost = getCost(weight, table);
              }
 
              else
@@ -105,7 +108,7 @@ int main()
              }
 
              // show the result of the transaction
-             showResult(trans, status, measure[0], cost);
+             showResult(trans, status, weight, cost);
          }
      } // end while loop
 
@@ -127,11 +130,11 @@ void populate(TableEntry t[])
      t[2].setWeight(3);
      t[2].setShipping(4.00);
      t[3].setWeight(5);
-     t[3].setShipping(6.75);
-     t[4].setWeight(7);
-     t[4].setShipping(9.90);
-     t[5].setWeight(10);
-     t[5].setShipping(14.95);
+     t[3].setShipping(6.75); // I could have saved myself some
+     t[4].setWeight(7);      // trouble if I'd made one setter
+     t[4].setShipping(9.90); // method that set both values,
+     t[5].setWeight(10);     // but by the time I thought of
+     t[5].setShipping(14.95);// that I was already done.
      t[6].setWeight(13);
      t[6].setShipping(19.40);
      t[7].setWeight(16);
@@ -152,114 +155,113 @@ void populate(TableEntry t[])
      t[14].setShipping(55.20);
 }
 
-/* The prompt function gives the user
+/* The showPrompt function gives the user
    instructions on what to enter. */
-void prompt()
+void showPrompt()
 {
     cout << "For each transaction, enter package weight and"
          << "3 dimensions.\nEnter -1 to quit.\n\n";
-}  // end prompt function
+
+}  // end showPrompt function
 
 /* The getTransaction function gets input from the user.
    It returns false when the user enters -1. */
-bool getTransaction(int measure[])
+bool getTransaction(int &weight, int &len1, int &len2, int &len3)
 {
     // helpful prompt
     cout << "Enter package weight and 3 dimensions: ";
 
-    /* for loop iterates through the storage array,
-       reading all the input values in, and overwriting
-       any values left over from last time through the input loop. */
-    for (int i =0; i< 4; i++)
-    {
-         cin >> measure[i]; // get input
+    // get weight
+    cin >> weight; // get input
 
-         /* if it's the first input (weight) and it's -1,
-            immediately return false and kill the loop. */
-         if (i == 0 && measure[i] == -1)
-             return false;
-    } // end for loop
+    // if weight is -1, immediately return false/kill the loop (in main)
+    if (weight == -1)
+        return false;
+
+    cin >> len1 >> len2 >> len3; // get rest of input
 
     // clear the buffer after getting all 4 values, just in case
     cin.ignore(numeric_limits<streamsize>::max(), '\n');
 
     // return true and keep going
     return true;
+
 } // end getTransaction function
 
 /* the getStatus function gets the status of a transaction
    and returns a bool to main true for accepted, false otherwise). */
-bool getStatus(int measure[])
+bool getStatus(int &weight, int &len1, int &len2, int &len3)
 {
      // initialize variables
      bool status = false;  // our bool
-     int largest = 0;    // holding variable for largest current side
+     int largest = len1;    // holding variable for largest current side
 
      // first check if we are over weight, if so, skip the rest
-     if (measure[0] <= MAX_WEIGHT)
+     if (weight <= MAX_WEIGHT)
      {
-         /* for loop iterates through sides. If the current side is
-            bigger than the number held in largest, largest takes the
-            value of the current number. Quick and easy. */
-         for (int i = 1; i < 4; i++)
-             if (measure[i] > largest)  // check against largest
-                 largest = measure[i];
+         if (len2 > largest)  // check against largest
+             largest = len2;
+         if (len3 > largest)  // and again
+             largest = len3;
 
          // this if clause determines whether we are over girth
-         if (2 * (measure[1] + measure[2]
-                       + measure[3] - largest) <= MAX_GIRTH)
+         if (2 * (len1 +len2 + len3 - largest) <= MAX_GIRTH)
              status = true;  // if not, true
      }  // end if
 
      // return status
      return status;
+
 } // end getStatus function
 
 /* getCost takes an int from our holding array for transaction input
    and our entire array of objects and calculates shipping cost. It isn't
    ever called if the transaction was rejected. */
-float getCost(int measure0, TableEntry table[])
+float getCost(int weight, TableEntry table[])
 {
      // handy for loop, iterate through object array
      for (int i = 0; i < T_SIZE; i++)
      {
          /* check if weight <= current TableEntry object's weight.
             If so, we know we are in the right category. */
-          if (measure0 <= table[i].getWeight())
+          if (weight <= table[i].getWeight())
              return table[i].getShipping();
      } // end for loop
+
 } // end getCost function
 
 /* errorMessage prints an error message if needed.
    It also returns a bool that serves as a flag for whether
    to continue processing the input or whether to restart. */
-bool errorMessage(int measure[])
+bool errorMessage(int &weight, int &len1, int &len2, int &len3)
 {
      bool error = false; // variable to hold return value
 
-     // loop through input values
-     for (int i =0; i < 4; i++)
-         // throw error message if non positive input
-         if (measure[i] <= 0)
-         {
-              cout << "\nError - package weight and dimensions must be "
-              << "larger than 0\nPlease re-enter transaction\n\n";
-              error = true;
-         }
+     // throw error message if non positive input
+     if (weight < 0 || len1 < 0 || len2 < 0 || len3 < 0)
+     {
+          cout << "\nError - package weight and dimensions must be "
+               << "larger than 0\nPlease re-enter transaction\n\n";
+
+          // set bool
+          error = true;
+     }
+
      // return bool
      return error;
+
 }  // end errorMessage function
 
 /* showResult takes all the values we've calculated and displays
    them for the user. */
-void showResult(int trans, string status, int measure0, float cost)
+void showResult(int trans, string status, int weight, float cost)
 {
      cout << "\nTransaction :"
           << setw(11) << trans
           << "\nStatus      :"
           << setw(11) << status
           << "\nWeight      :"
-          << setw(11) << measure0
+          << setw(11) << weight
           << "\nCost        :";
 
      // decide whether to show a cost or show a -
@@ -267,7 +269,8 @@ void showResult(int trans, string status, int measure0, float cost)
          cout << setw(11) << cost << "\n\n";
      else
          cout << setw(11) << "-" << "\n\n";
-}  // end showResult
+
+}  // end showResult function
 
 /* showTotals takes the accumulators we've been running and
    prints them out, so the user knows how many packages were
@@ -279,4 +282,5 @@ void showTotals(int accepted, int rejected)
          << accepted << endl
          << "Number of rejected packages: "
          << rejected << endl;
-}
+
+} // end showTotals function
