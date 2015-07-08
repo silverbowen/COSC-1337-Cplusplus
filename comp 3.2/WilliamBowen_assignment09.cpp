@@ -7,8 +7,7 @@
    This is a payroll program for Armadillo Automotive Group.
    It uses a C++ class called employee. Each employee's info
    is held in an Employee object, and all objects are held in
-   a master array. A second class called Pay holds employee
-   pay info. All input comes from files rather than the keyboard. */
+   a master array. Input comes from files rather than the keyboard. */
 
 #include <iostream>  // for cin/cout
 #include <iomanip>   // for setw()
