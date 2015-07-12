@@ -1,3 +1,17 @@
 ID Employee Name        Gross Pay       Tax   Insurance   Net Pay
 -----------------------------------------------------------------
-      Total gross pay:       0.00       Total net pay:       0.00
+17 Juan Gonzales           600.00     90.00          20    490.00
+37 Nina Kamran             930.00    139.50          20    770.50
+ 5 Christine Kim          1200.00    180.00          40    980.00
+42 J. P. Morgan            493.75     74.06           0    419.69
+24 Esther Bianco           153.75     23.06           0    130.69
+22 Cindy Burke             600.00     90.00          20    490.00
+15 Ray Allrich             440.75     66.11           0    374.64
+18 Morris Kramer           358.00     53.70           0    304.30
+25 Jim Moore              1237.50    185.62          60    991.88
+32 Paula Cameron           362.50     54.38           0    308.12
+40 Imelda Buentello        743.12    111.47           0    631.66
+16 Adrian Bailey           500.00     75.00           0    425.00
+38 Julie Brown            1225.00    183.75           0   1041.25
+43 Maria Diaz              600.00     90.00           0    510.00
+      Total gross pay:    9444.38       Total net pay:    7867.72

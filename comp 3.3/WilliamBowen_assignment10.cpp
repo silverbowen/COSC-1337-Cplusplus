@@ -38,6 +38,7 @@ class Employee
     /* Getters for all five member variables.
        Defined inline because they are short.*/
     int getID(){ return id; }
+    // because C-strings are arrays, get name returns a char* pointer
     const char* getName() { return name; }
     double getHourlyPay() { return hourlyPay; }
     int getNumDeps() { return numDeps; }
@@ -85,30 +86,40 @@ int main()
        return 1;
     }
 
-    // Call set function to populate objects using for loop
+    /* This for loop iterates through the Employee object array, reading
+       values from the Master File and assigning them to Employee objects. */
     for (int i = 0; i < MAX_EMPLOYEES; i++)
     {
-        // Read each variable from file - while no read error
+        /* Read each variable from inFile, checking for end-of-file
+           via read-error method. */
         if (inFile >> id)
         {
-            cout << "id read " << id << "\n";
+            // Ignore whitespace before calling getline
             inFile.ignore();
+
+            /* Call getline to get name. As noted in the assignment page,
+               this raises an error and causes further ifstream operations
+               to fail. We could accomplish the same thing by calling
+               get rather than getline, but I chose a different method. */
             inFile.getline(name, 21);
-            cout << "name read " << name << "\n";
-            if (!(inFile >> hourlyPay))
-                cout << "Failed!";
-            inFile >> numDeps >> type;
-            cout << "h n t read " << hourlyPay << " " << numDeps << " " << type << "\n";
+
+            // Clear error bit, so ifstream operations can resume :)
+            inFile.clear();
+
+            // Continue reading values
+            inFile >> hourlyPay >> numDeps >> type;
+
+            // Ignore last character (sex) and newline character
             inFile.ignore(2);
 
             // Use setter to write variables to object
             employee[i].set(id, name, hourlyPay, numDeps, type);
         }
 
-        // end loop if end of file
+        // end  the loop when we're at the end of file (saves on processing)
         else
              i = MAX_EMPLOYEES;
-    } // end for loop
+    } // end populate Employees for loop
 
     // Close inFile
     inFile.close();
@@ -130,66 +141,77 @@ int main()
      outFile << "----------------------------------------------"
              << "-------------------" << endl;
 
-    // read data, process, and write to report using for loop
+    /* This for loop iterates through the transaction file. For each entry,
+       the following if/else and for loops read data, process the data, then
+       either call error messages or write to the report. */
     for (int i = 0; i < MAX_EMPLOYEES; i++)
     {
-        // Get variable values from inFile2 - if no read error
+        /* Read each variable from inFile2, checking for end-of-file
+           via read-error method. */
         if (inFile2 >> id)
         {
+            // read hours worked
             inFile2 >> hoursWorked;
 
-            // search employee array for employee id
+            /* This for loop searches the Employee objects array for
+               a corresponding employee ID. Note that the new index is j. */
             for (int j = 0; j < MAX_EMPLOYEES; j++)
             {
-                // when found
+                // If getID() equals the extracted id:
                 if (employee[j].getID() == id)
                 {
-                    // set flag
+                    /* Set flag. If this isn't set to true during this loop,
+                       an 'employee not found' error will be raised. */
                     flag = true;
 
 
-                    // Validate employee object id - if 0 it's invalid = error
+                    /* Validate the employee object ID. If it is 0 then invalid
+                       data was entered during object creation. If so, print
+                       an error message and skip further calculations. */
                     if (!employee[j].getID())
                         cout << "Entry #" << i+1 << " in employee master file "
                              << "-- invalid employee data!\n";
 
-                    // Validate hours worked - if < 0 = error
+                    /* Validate hours the worked. If they are less than 0,
+                       print an error message and skip further calculations. */
                     else if (hoursWorked < 0.0)
-                        cout << "Entry #" << i+1 << " employee #"
-                             << id << " in transaction file --"
-                             << " invalid hours worked!\n";
+                        cout << "Entry #" << i+1 << " in transaction file --"
+                             << " employee ID " << id
+                             << " -- invalid hours worked!\n";
 
-                    // If object and transaction are valid - write to report
+                    /* If the object and transaction are valid, do needed
+                      calculations, then write to report. */
                     else
                     {
-                        /* Determine overtime - not eligible
-                           if hours > 40 or type = union (0). */
-                        if (hoursWorked <= 40 || employee[i].getType())
-                            grossPay = hoursWorked
-                            * employee[i].getHourlyPay();
-
-                        // otherwise eligible
-                        else
-                            grossPay = (40 * employee[i].getHourlyPay())
+                        /* Determine overtime. Employees are eligible if hours
+                           worked is over 40 and their type is 0 (union). Here
+                           we actually check if type is false (not positive). */
+                        if (hoursWorked > 40 && !(employee[j].getType()))
+                            grossPay = (40 * employee[j].getHourlyPay())
                                        + ((hoursWorked - 40)
-                                          * employee[i].getHourlyPay()
+                                          * employee[j].getHourlyPay()
                                           * 1.5);
+
+                        // Else employee is ineligible for overtime
+                        else
+                            grossPay = hoursWorked
+                            * employee[j].getHourlyPay();
 
                         // Calculate tax, insurance, and net pay
                         tax = grossPay * TAX_RATE;
-                        insurance = employee[i].getNumDeps() * INSURANCE;
+                        insurance = employee[j].getNumDeps() * INSURANCE;
                         netPay = grossPay - tax - insurance;
 
                         // Write everything to report
                         outFile << fixed << setprecision(2)
                                 << setw(2)  << id << " "
-                                << setw(20) << left << employee[i].getName()
+                                << setw(20) << left << employee[j].getName()
                                 << setw(10) << right << grossPay
                                 << setw(10) << tax
                                 << setw(12) << insurance
                                 << setw(10) << netPay << endl;
 
-                        // Accumulate and iterate
+                        // Accumulate and iterate totals
                         totalGross += grossPay;
                         totalNet += netPay;
                         transactions++;
@@ -200,7 +222,9 @@ int main()
 
             // if employee not found
             if (flag == false)
-                cout << "Employee ID " << id << " not found in Master File!\n";
+                cout << "Entry #" << i << " in transaction file -- "
+                     << "employee ID " << id
+                     << " -- not found in Master File!\n";
 
             // reset flag
             flag = false;
@@ -228,37 +252,49 @@ int main()
 
 } // End main
 
-Employee::Employee(int initId, char initName[],
-                   double initHourlyPay,
+/* This is the constructor for the Employee class. It calls set and uses the
+   returned value to determine if all the parameters are valid. If not, it
+   sets everything to 0 or "", so we can print a suitable error message
+   in main as needed. */
+Employee::Employee(int initId, char initName[], double initHourlyPay,
                    int initNumDeps, int initType)
 {
+  // Call set and check for boolean return type
   bool status = set(initId, initName, initHourlyPay,
                     initNumDeps, initType);
 
+  // If false was returned
   if (!status)
   {
     id = 0;
+    // Because we are using an array pointer, strcpy is needed to set name
     strcpy(name, "");
     hourlyPay = 0.0;
     numDeps = 0;
     type = 0;
   }
-}
+} // End Employee::Constructor
 
+/* The set member function does validation. If invalid data is sent, it
+   skips setting the data and returns false. */
 bool Employee::set(int newId, char newName[], double newHourlyPay,
                    int newNumDeps, int newType)
 {
+  // Initialize status to false
   bool status = false;
 
+  // If data is valid, perform set operation
   if (newId > 0 && newHourlyPay > 0 && newNumDeps >= 0 &&
       newType >= 0 && newType <= 1)
   {
     status = true;
     id = newId;
+    // Again using strcpy
     strcpy(name, newName);
     hourlyPay = newHourlyPay;
     numDeps = newNumDeps;
     type = newType;
   }
+  // return bollean value
   return status;
-}
+} // End Employee::set member function
