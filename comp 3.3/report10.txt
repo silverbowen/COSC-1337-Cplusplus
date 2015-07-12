@@ -1,0 +1,3 @@
+ID Employee Name        Gross Pay       Tax   Insurance   Net Pay
+-----------------------------------------------------------------
+      Total gross pay:       0.00       Total net pay:       0.00

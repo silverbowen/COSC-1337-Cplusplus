@@ -1,0 +1,16 @@
+ 5 Christine Kim       30.00 2 1 F
+15 Ray Allrich         10.25 0 0 M
+16 Adrian Bailey       12.50 0 0 F
+17 Juan Gonzales       30.00 1 1 M
+18 Morris Kramer        8.95 0 0 M
+22 Cindy Burke         15.00 1 0 F
+24 Esther Bianco       10.25 0 0 F
+25 Jim Moore           27.50 3 1 M
+32 Paula Cameron       14.50 0 0 F
+36 Melvin Ducan        10.25 0 0 M
+37 Nina Kamran         30.00 1 1 F
+38 Julie Brown         35.00 0 1 F
+40 Imelda Buentello    14.50 0 0 F
+42 J. P. Morgan        12.50 0 0 M
+43 Maria Diaz          15.00 0 0 F
+
